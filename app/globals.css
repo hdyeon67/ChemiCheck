@@ -1,0 +1,59 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: #2b1746;
+  /* Y2K 스티커 무드: 핑크 → 퍼플 비비드 그라데이션 */
+  background: linear-gradient(160deg, #ff8fd4 0%, #c86bf5 45%, #8b5cf6 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  /* 흰 스티커 카드 */
+  .sticker {
+    @apply rounded-3xl bg-white/95 shadow-[0_10px_30px_-8px_rgba(80,20,120,0.45)] ring-1 ring-white/60 backdrop-blur;
+  }
+
+  /* 알약형 그라데이션 버튼 */
+  .btn-pop {
+    @apply inline-flex items-center justify-center rounded-full bg-gradient-to-r from-chemi-pink to-chemi-violet px-6 py-3 font-bold text-white shadow-lg transition active:scale-95 disabled:opacity-50;
+  }
+
+  .field-label {
+    @apply mb-1 block text-sm font-semibold text-chemi-violet;
+  }
+
+  .field-input {
+    @apply w-full rounded-2xl border-2 border-purple-100 bg-purple-50/60 px-4 py-3 text-base outline-none transition focus:border-chemi-pink focus:bg-white;
+  }
+}
+
+/* 점수 카운트업 등 진입 애니메이션 */
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-pop-in {
+  animation: pop-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
