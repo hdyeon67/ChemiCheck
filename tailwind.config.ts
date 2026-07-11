@@ -14,6 +14,11 @@ const config: Config = {
           purple: "#a855f7",
           violet: "#7c3aed",
         },
+        // shadcn 계열 테마 토큰 (EDEN 표준 푸터 등에서 사용)
+        border: "hsl(var(--border))",
+        foreground: "hsl(var(--foreground))",
+        "muted-foreground": "hsl(var(--muted-foreground))",
+        primary: "hsl(var(--primary))",
       },
       fontFamily: {
         sans: ["Pretendard", "system-ui", "sans-serif"],

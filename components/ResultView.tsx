@@ -5,7 +5,7 @@ import ScoreCounter from "./ScoreCounter";
 import { PersonaBadge } from "./PersonaBadge";
 import ShareButtons from "./ShareButtons";
 import AdRails from "./AdRails";
-import SiteFooter from "./SiteFooter";
+import { Footer } from "./footer";
 
 const RELATION_LABEL: Record<RelationType, string> = {
   couple: "썸·연인 케미",
@@ -148,7 +148,11 @@ export default function ResultView({
         내 차례! 나도 해보기 →
       </Link>
 
-      <SiteFooter />
+      <Footer
+        logoSrc={null}
+        links={[{ label: "서비스 소개", href: "/about" }]}
+        note="재미로 보는 콘텐츠예요 · 입력 정보는 저장되지 않아요"
+      />
 
       {/* 반응형 광고: 데스크톱 좌우 세로 / 모바일 하단 가로 */}
       <AdRails />

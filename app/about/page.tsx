@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import SiteFooter from "@/components/SiteFooter";
+import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "케미체크 소개 · 개인정보 안내",
@@ -67,7 +67,11 @@ export default function AboutPage() {
         케미 확인하러 가기 ✨
       </Link>
 
-      <SiteFooter />
+      <Footer
+        logoSrc={null}
+        links={[{ label: "홈", href: "/" }]}
+        note="재미로 보는 콘텐츠예요 · 입력 정보는 저장되지 않아요"
+      />
     </main>
   );
 }

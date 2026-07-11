@@ -1,5 +1,5 @@
 import ChemiForm from "@/components/ChemiForm";
-import SiteFooter from "@/components/SiteFooter";
+import { Footer } from "@/components/footer";
 
 export default function Home() {
   return (
@@ -13,7 +13,11 @@ export default function Home() {
         </p>
       </header>
       <ChemiForm />
-      <SiteFooter />
+      <Footer
+        logoSrc={null}
+        links={[{ label: "서비스 소개", href: "/about" }]}
+        note="재미로 보는 콘텐츠예요 · 입력 정보는 저장되지 않아요"
+      />
     </main>
   );
 }

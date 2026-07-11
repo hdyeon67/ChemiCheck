@@ -6,6 +6,13 @@
 
 :root {
   color-scheme: light;
+
+  /* shadcn 계열 테마 토큰 — 비비드 그라데이션 배경 위 흰 계열로 매핑
+     (EDEN 표준 푸터가 이 토큰만 사용) */
+  --foreground: 0 0% 100%;
+  --muted-foreground: 0 0% 98%;
+  --border: 0 0% 100%;
+  --primary: 326 100% 68%;
 }
 
 html,
