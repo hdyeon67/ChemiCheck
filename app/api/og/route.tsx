@@ -7,7 +7,8 @@ import { calculateChemi } from "@/lib/scoring";
 import { buildReport, personaOf } from "@/lib/copy";
 import { decodePayload } from "@/lib/share/encode";
 
-export const runtime = "edge";
+// Cloudflare Workers(OpenNext)에서는 워커 자체가 엣지 런타임이므로
+// Next의 edge runtime 선언을 쓰지 않는다(기본 서버 함수에서 실행).
 
 const FONT_URL =
   "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/public/static/Pretendard-Bold.otf";
