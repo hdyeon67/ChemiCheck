@@ -1,17 +1,16 @@
 // 동적 OG 이미지 — 카톡/링크 미리보기에 점수+등급+두 이름 노출 (바이럴 유도)
-//   next/og(satori) 기반. 외부 키 불필요. 한글 렌더용 폰트만 공개 CDN에서 가져오되
-//   실패해도 이미지는 생성되도록 그레이스풀 폴백.
+//   next/og(satori) 기반. 외부 키·CDN 불필요.
+//   Cloudflare Workers(128MB) 제약에 맞춰 메모리를 최소화:
+//   - 한글 폰트는 워커 ASSETS의 KS X 1001 서브셋(337KB)
+//   - 솔리드 배경/뱃지(그라데이션·섀도 없음), 600×315 캔버스
+//   - Cache API로 d별 1회만 렌더 후 엣지 캐시
 
 import { ImageResponse } from "next/og";
 import { calculateChemi } from "@/lib/scoring";
 import { buildReport, personaOf } from "@/lib/copy";
 import { decodePayload } from "@/lib/share/encode";
 
-// Cloudflare Workers(OpenNext)에서는 워커 자체가 엣지 런타임이므로
-// Next의 edge runtime 선언을 쓰지 않는다(기본 서버 함수에서 실행).
-
-const FONT_URL =
-  "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/packages/pretendard/dist/public/static/Pretendard-Bold.otf";
+const FONT_PATH = "/fonts/pretendard-kr-subset.ttf";
 
 const RELATION_LABEL: Record<string, string> = {
   couple: "썸·연인 케미",
@@ -19,20 +18,55 @@ const RELATION_LABEL: Record<string, string> = {
   coworker: "직장동료 케미",
 };
 
-async function loadFont(): Promise<ArrayBuffer | null> {
+const W = 600;
+const H = 315;
+
+// 따뜻한 아이솔레이트 안에서 폰트를 한 번만 받아 재사용(매 렌더 재fetch/파싱 방지)
+let cachedFont: ArrayBuffer | null = null;
+async function loadFont(origin: string): Promise<ArrayBuffer | null> {
+  if (cachedFont) return cachedFont;
   try {
-    const res = await fetch(FONT_URL, { cache: "force-cache" });
+    const res = await fetch(new URL(FONT_PATH, origin), { cache: "force-cache" });
     if (!res.ok) return null;
-    return await res.arrayBuffer();
+    cachedFont = await res.arrayBuffer();
+    return cachedFont;
   } catch {
     return null;
   }
 }
 
-export async function GET(req: Request) {
+// OG 이미지는 d별로 결정적 → 엣지에서 오래 캐시.
+const OG_HEADERS = {
+  "Cache-Control": "public, immutable, no-transform, max-age=31536000, s-maxage=31536000",
+};
+
+// Cloudflare는 Worker가 "생성한" 응답을 헤더만으로 자동 캐시하지 않는다.
+// Cache API로 명시적으로 캐시해, 같은 d 요청은 한 번만 렌더한다.
+export async function GET(req: Request): Promise<Response> {
+  const cache = (globalThis as { caches?: { default?: Cache } }).caches?.default;
+  const cacheKey = new Request(new URL(req.url).toString(), { method: "GET" });
+
+  if (cache) {
+    const hit = await cache.match(cacheKey);
+    if (hit) return hit;
+  }
+
+  const res = await render(req);
+
+  if (cache && res.ok) {
+    try {
+      await cache.put(cacheKey, res.clone());
+    } catch {
+      /* 캐시 저장 실패는 무시 */
+    }
+  }
+  return res;
+}
+
+async function render(req: Request): Promise<Response> {
   const { searchParams } = new URL(req.url);
   const payload = decodePayload(searchParams.get("d"));
-  const font = await loadFont();
+  const font = await loadFont(req.url);
   const fonts = font
     ? [{ name: "Pretendard", data: font, weight: 700 as const, style: "normal" as const }]
     : undefined;
@@ -50,24 +84,22 @@ export async function GET(req: Request) {
             justifyContent: "center",
             fontFamily: "Pretendard",
             fontWeight: 700,
-            fontSize: 84,
+            fontSize: 44,
             color: "#fff",
-            background: "linear-gradient(135deg,#ff8fd4,#8b5cf6)",
+            background: "#8b5cf6",
           }}
         >
-          케미체크 🧪
+          케미체크
         </div>
       ),
-      { width: 1200, height: 630, fonts },
+      { width: W, height: H, fonts, headers: OG_HEADERS },
     );
   }
 
   const result = calculateChemi(payload);
   const report = buildReport(result, payload.relation);
-  const personaA = personaOf(result.profileA.ohaeng);
-  const personaB = personaOf(result.profileB.ohaeng);
-  const colorA = personaA.color;
-  const colorB = personaB.color;
+  const colorA = personaOf(result.profileA.ohaeng).color;
+  const colorB = personaOf(result.profileB.ohaeng).color;
 
   return new ImageResponse(
     (
@@ -80,8 +112,8 @@ export async function GET(req: Request) {
           alignItems: "center",
           justifyContent: "center",
           fontFamily: "Pretendard",
-          background: "linear-gradient(135deg,#ff8fd4 0%,#c86bf5 45%,#8b5cf6 100%)",
-          padding: 48,
+          background: "#8b5cf6",
+          padding: 24,
         }}
       >
         <div
@@ -89,59 +121,44 @@ export async function GET(req: Request) {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            width: 1000,
-            padding: "56px 48px",
-            borderRadius: 48,
-            background: "rgba(255,255,255,0.96)",
-            boxShadow: "0 20px 60px rgba(80,20,120,0.35)",
+            width: 500,
+            padding: "26px 24px",
+            borderRadius: 24,
+            background: "#ffffff",
           }}
         >
-          <div style={{ display: "flex", fontSize: 30, fontWeight: 700, color: "#a855f7" }}>
+          <div style={{ display: "flex", fontSize: 16, fontWeight: 700, color: "#a855f7" }}>
             {RELATION_LABEL[payload.relation] ?? "케미"}
           </div>
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 20,
-              marginTop: 12,
-              fontSize: 60,
+              marginTop: 6,
+              fontSize: 32,
               fontWeight: 700,
               color: "#2b1746",
             }}
           >
-            <span style={{ color: colorA }}>
-              {personaA.emoji} {payload.a.name}
-            </span>
-            <span style={{ color: "#d8b4fe" }}>×</span>
-            <span style={{ color: colorB }}>
-              {personaB.emoji} {payload.b.name}
-            </span>
+            <span style={{ color: colorA }}>{payload.a.name}</span>
+            <span style={{ color: "#d8b4fe", margin: "0 10px" }}>×</span>
+            <span style={{ color: colorB }}>{payload.b.name}</span>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "baseline", marginTop: 4, fontWeight: 700 }}>
+            <span style={{ fontSize: 104, lineHeight: 1, color: "#c026d3" }}>{result.score}</span>
+            <span style={{ fontSize: 30, color: "#9aa4bb", marginLeft: 4 }}>점</span>
           </div>
 
           <div
             style={{
               display: "flex",
-              alignItems: "baseline",
               marginTop: 8,
-              fontWeight: 700,
-            }}
-          >
-            <span style={{ fontSize: 200, lineHeight: 1, color: "#c026d3" }}>
-              {result.score}
-            </span>
-            <span style={{ fontSize: 56, color: "#9aa4bb", marginLeft: 8 }}>점</span>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              marginTop: 12,
-              padding: "12px 32px",
+              padding: "6px 18px",
               borderRadius: 999,
-              background: "linear-gradient(90deg,#ff5db1,#7c3aed)",
+              background: "#ff5db1",
               color: "#fff",
-              fontSize: 40,
+              fontSize: 22,
               fontWeight: 700,
             }}
           >
@@ -152,16 +169,16 @@ export async function GET(req: Request) {
         <div
           style={{
             display: "flex",
-            marginTop: 32,
-            fontSize: 30,
+            marginTop: 16,
+            fontSize: 16,
             fontWeight: 700,
-            color: "rgba(255,255,255,0.95)",
+            color: "#ffffff",
           }}
         >
           케미체크 · 나도 해보기
         </div>
       </div>
     ),
-    { width: 1200, height: 630, fonts },
+    { width: W, height: H, fonts, headers: OG_HEADERS },
   );
 }
