@@ -18,12 +18,12 @@
 
 | 영역 | 사용 |
 |---|---|
-| 프레임워크 | Next.js 14 (App Router) + TypeScript |
+| 프레임워크 | Next.js 15 (App Router) + React 19 + TypeScript |
 | 스타일 | Tailwind CSS + Pretendard |
-| OG 이미지 | `next/og` (satori) |
+| OG 이미지 | `next/og` (satori) — 한글 서브셋 폰트, Cache API |
 | 이미지 저장 | `html-to-image` |
 | 테스트 | Vitest |
-| 배포 | Vercel |
+| 배포 | Cloudflare Workers (`@opennextjs/cloudflare`) |
 
 ## 🧮 점수 계산 로직
 
@@ -73,25 +73,34 @@ npx tsc --noEmit   # 타입체크
 - **애드핏(광고)**: https://adfit.kakao.com → 매체·광고 단위 등록 → **심사 통과 후** 광고 단위
   ID(`DAN-...`) 발급. 미설정 시 결과 페이지에 "광고 준비 중" 플레이스홀더가 노출됩니다.
 
-## ▲ Vercel 배포
+## ☁️ Cloudflare Workers 배포
 
-1. 이 저장소를 GitHub 등에 푸시
-2. [vercel.com/new](https://vercel.com/new) 에서 저장소 임포트
-3. 프레임워크 프리셋: **Next.js** (자동 감지, 추가 설정 불필요)
-4. (선택) **Settings → Environment Variables** 에 위 환경변수 등록
-5. **Deploy** 클릭 → 완료
-
-> OG 이미지 라우트(`/api/og`)는 Edge에서 동작하며 별도 설정이 필요 없어요.
-> 배포 후 `metadataBase`(현재 `app/layout.tsx` 의 `chemicheck.vercel.app`)를
-> 실제 도메인으로 바꾸면 OG 절대경로가 정확해집니다.
-
-### CLI 배포 (대안)
+OpenNext 어댑터(`@opennextjs/cloudflare`)로 Cloudflare Workers에 배포합니다.
+광고=상업적 이용이라 Vercel Hobby 약관 대상이 아니고, Cloudflare Workers 무료 티어는
+상업 이용을 허용해 **0원**으로 운영됩니다.
 
 ```bash
-npm i -g vercel
-vercel          # 미리보기 배포
-vercel --prod   # 프로덕션 배포
+npx wrangler login          # 1회 (브라우저 OAuth)
+npm run cf:build            # OpenNext 빌드 (.open-next 생성)
+npx wrangler dev --local    # 로컬 workerd 실측 (전 라우트 + /api/og)
+npx wrangler deploy         # wrangler.jsonc의 custom_domain 으로 배포
 ```
+
+- 라우트/도메인은 `wrangler.jsonc` 의 `routes[].pattern` 에서 지정 (`custom_domain: true`).
+  도메인이 Cloudflare DNS에 있으면 배포 시 DNS/SSL이 자동 연결됩니다.
+- 커스텀 도메인에 기존 CNAME(예: Vercel)이 있으면 **먼저 삭제**해야 연결됩니다.
+- `NEXT_PUBLIC_*` 는 빌드타임 인라인이므로 `.env.production`(공개값) / `.env.local` 에 둡니다.
+- `metadataBase`(`app/layout.tsx`)는 실도메인(`https://chemicheck.fineboll.com`)으로 고정.
+
+### GitHub → Cloudflare 자동배포 (선택)
+Cloudflare 대시보드 → **Workers & Pages → chemicheck → Settings → Build → Connect Git**.
+빌드 커맨드 `npx opennextjs-cloudflare build`, 배포 `npx wrangler deploy`.
+`.env.production` 이 커밋돼 있어 별도 환경변수 등록 없이 빌드됩니다.
+
+> **OG 이미지 주의(Workers 128MB 제약)**: `/api/og` 는 한글 서브셋 폰트(337KB) +
+> 솔리드 디자인 + 600×315 + Cache API 로 메모리를 맞췄습니다. 디자인을 무겁게
+> 바꾸면(그라데이션·섀도·이모지·대형 캔버스) 렌더가 128MB를 넘어 503이 날 수 있습니다.
+> `public/fonts/pretendard-kr-subset.ttf` 는 EUC-KR(KS X 1001) 상용 한글 2350자 서브셋.
 
 ## 📁 구조
 
