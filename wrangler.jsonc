@@ -5,5 +5,5 @@
   "compatibility_date": "2025-03-25",
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
-  "routes": [{ "pattern": "chemicheck-test.fineboll.com", "custom_domain": true }]
+  "routes": [{ "pattern": "chemicheck.fineboll.com", "custom_domain": true }]
 }
