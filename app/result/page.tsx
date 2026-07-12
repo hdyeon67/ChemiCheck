@@ -9,12 +9,14 @@ import ResultView from "@/components/ResultView";
 export const dynamic = "force-dynamic";
 
 // 카톡·SNS 미리보기용 동적 OG 메타태그 (점수+등급+두 이름)
-export function generateMetadata({
+// Next 15: searchParams 는 Promise
+export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: { d?: string };
-}): Metadata {
-  const payload = decodePayload(searchParams.d);
+  searchParams: Promise<{ d?: string }>;
+}): Promise<Metadata> {
+  const { d } = await searchParams;
+  const payload = decodePayload(d);
   if (!payload) {
     return { title: "케미체크 결과" };
   }
@@ -22,7 +24,7 @@ export function generateMetadata({
   const report = buildReport(result, payload.relation);
   const title = `${payload.a.name} × ${payload.b.name} 케미 ${result.score}점! (${report.badge})`;
   const description = `${report.chemiType} · 나도 케미 확인하러 가기`;
-  const ogUrl = `/api/og?d=${searchParams.d ?? ""}`;
+  const ogUrl = `/api/og?d=${d ?? ""}`;
   return {
     title,
     description,
@@ -40,12 +42,13 @@ export function generateMetadata({
   };
 }
 
-export default function ResultPage({
+export default async function ResultPage({
   searchParams,
 }: {
-  searchParams: { d?: string };
+  searchParams: Promise<{ d?: string }>;
 }) {
-  const payload = decodePayload(searchParams.d);
+  const { d } = await searchParams;
+  const payload = decodePayload(d);
 
   if (!payload) {
     return (
