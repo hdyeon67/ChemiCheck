@@ -5,6 +5,7 @@ import ScoreCounter from "./ScoreCounter";
 import { PersonaBadge } from "./PersonaBadge";
 import ShareButtons from "./ShareButtons";
 import AdRails from "./AdRails";
+import { CrossPromo } from "./CrossPromo";
 import { Footer } from "./footer";
 
 const RELATION_LABEL: Record<RelationType, string> = {
@@ -147,6 +148,9 @@ export default function ResultView({
       >
         내 차례! 나도 해보기 →
       </Link>
+
+      {/* 크로스 프로모션 (다른 앱 배너) */}
+      <CrossPromo />
 
       <Footer
         logoSrc={null}
