@@ -5,7 +5,7 @@ import ScoreCounter from "./ScoreCounter";
 import { PersonaBadge } from "./PersonaBadge";
 import ShareButtons from "./ShareButtons";
 import AdRails from "./AdRails";
-import { CrossPromo } from "./CrossPromo";
+import { ResultBridge } from "./ResultBridge";
 import { Footer } from "./footer";
 
 const RELATION_LABEL: Record<RelationType, string> = {
@@ -47,12 +47,16 @@ export default function ResultView({
   report,
   aName,
   bName,
+  aBirth,
+  bBirth,
   relation,
 }: {
   result: ChemiResult;
   report: ChemiReport;
   aName: string;
   bName: string;
+  aBirth: string;
+  bBirth: string;
   relation: RelationType;
 }) {
   return (
@@ -149,8 +153,14 @@ export default function ResultView({
         내 차례! 나도 해보기 →
       </Link>
 
-      {/* 크로스 프로모션 (다른 앱 배너) */}
-      <CrossPromo />
+      {/* 맥락형 브릿지 (사주=각자 생일 딥링크 / 좋은날=관계 맞춤) */}
+      <ResultBridge
+        aName={aName}
+        bName={bName}
+        aBirth={aBirth}
+        bBirth={bBirth}
+        relation={relation}
+      />
 
       <Footer
         logoSrc={null}

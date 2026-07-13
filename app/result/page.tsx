@@ -77,6 +77,8 @@ export default async function ResultPage({
       report={report}
       aName={payload.a.name}
       bName={payload.b.name}
+      aBirth={payload.a.birth}
+      bBirth={payload.b.birth}
       relation={payload.relation}
     />
   );
