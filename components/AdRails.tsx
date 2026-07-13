@@ -7,11 +7,11 @@ import AdSlot from "./AdSlot";
 //   (애드핏 광고 단위 ID는 공개 값이라 클라이언트에 그대로 노출됨)
 
 const UNIT_SIDE_LEFT =
-  process.env.NEXT_PUBLIC_ADFIT_UNIT_SIDE_LEFT || "DAN-exdHoDajScRCl2Jj";
+  process.env.NEXT_PUBLIC_ADFIT_UNIT_SIDE_LEFT || "DAN-Kf2VFWm73RqO3mtd";
 const UNIT_SIDE_RIGHT =
-  process.env.NEXT_PUBLIC_ADFIT_UNIT_SIDE_RIGHT || "DAN-46vNdoBrHisHxu8q";
+  process.env.NEXT_PUBLIC_ADFIT_UNIT_SIDE_RIGHT || "DAN-kb9sHHkgwBF4sGQ6";
 const UNIT_MOBILE =
-  process.env.NEXT_PUBLIC_ADFIT_UNIT_MOBILE || "DAN-j2N5MaHx5Aq2DO4d";
+  process.env.NEXT_PUBLIC_ADFIT_UNIT_MOBILE || "DAN-KfIogZPTNSU5k8Tb";
 
 export default function AdRails() {
   return (
