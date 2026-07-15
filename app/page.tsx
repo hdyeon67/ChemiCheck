@@ -1,9 +1,10 @@
 import ChemiForm from "@/components/ChemiForm";
 import { Footer } from "@/components/footer";
+import AdRails from "@/components/AdRails";
 
 export default function Home() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col px-4 pt-6">
+    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col px-4 pb-32 pt-6 lg:pb-6">
       <header className="mb-4 text-center">
         <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-md">
           케미체크
@@ -18,6 +19,9 @@ export default function Home() {
         links={[{ label: "서비스 소개", href: "/about" }]}
         note="재미로 보는 콘텐츠예요 · 입력 정보는 저장되지 않아요"
       />
+
+      {/* 반응형 광고: 데스크톱 좌우 세로 / 모바일 하단 가로 (다른 서비스처럼 시작화면부터 노출) */}
+      <AdRails />
     </main>
   );
 }
