@@ -71,7 +71,7 @@ async function render(req: Request): Promise<Response> {
     ? [{ name: "Pretendard", data: font, weight: 700 as const, style: "normal" as const }]
     : undefined;
 
-  // 잘못된 데이터: 브랜드 카드로 폴백
+  // 결과 없음(홈/기본 공유): Y2K 비비드 브랜드 카드 (1200x630)
   if (!payload) {
     return new ImageResponse(
       (
@@ -80,19 +80,38 @@ async function render(req: Request): Promise<Response> {
             width: "100%",
             height: "100%",
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             fontFamily: "Pretendard",
             fontWeight: 700,
-            fontSize: 44,
-            color: "#fff",
-            background: "#8b5cf6",
+            color: "#ffffff",
+            padding: 64,
+            background: "linear-gradient(135deg, #a855f7 0%, #ff5db1 100%)",
           }}
         >
-          케미체크
+          <div
+            style={{
+              display: "flex",
+              background: "#ffffff",
+              color: "#a855f7",
+              fontSize: 30,
+              padding: "10px 30px",
+              borderRadius: 999,
+              marginBottom: 30,
+            }}
+          >
+            이름만 넣으면 바로
+          </div>
+          <div style={{ display: "flex", fontSize: 132, fontWeight: 700 }}>
+            케미체크
+          </div>
+          <div style={{ display: "flex", fontSize: 42, marginTop: 20 }}>
+            우리 궁합, 몇 %일까?
+          </div>
         </div>
       ),
-      { width: W, height: H, fonts, headers: OG_HEADERS },
+      { width: 1200, height: 630, fonts, headers: OG_HEADERS },
     );
   }
 

@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     title: "케미체크 — 우리 궁합 몇 점?",
     description: "이름과 생년월일로 보는 재미 궁합 테스트",
     type: "website",
+    images: ["/api/og"],
   },
 };
 
