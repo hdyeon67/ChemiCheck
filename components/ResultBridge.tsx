@@ -1,5 +1,8 @@
+"use client";
+
 import type { RelationType } from "@/lib/scoring/types";
 import { PROMOS } from "@/lib/config/promos";
+import { track } from "@/lib/analytics";
 
 const SAJU_URL =
   PROMOS.find((p) => p.id === "saju")?.href ?? "https://saju.fineboll.com";
@@ -70,6 +73,7 @@ export function ResultBridge({
             href={sajuLink(aBirth)}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => track("cross_banner_click", { target_app: "saju" })}
             className="truncate rounded-2xl bg-purple-50 px-3 py-2.5 text-center text-sm font-black text-chemi-violet transition active:scale-95"
           >
             🔮 {aName} 사주 →
@@ -78,6 +82,7 @@ export function ResultBridge({
             href={sajuLink(bBirth)}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => track("cross_banner_click", { target_app: "saju" })}
             className="truncate rounded-2xl bg-purple-50 px-3 py-2.5 text-center text-sm font-black text-chemi-violet transition active:scale-95"
           >
             🔮 {bName} 사주 →
@@ -90,6 +95,7 @@ export function ResultBridge({
         href={GOODDAY_URL}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => track("cross_banner_click", { target_app: "goodday" })}
         className="sticker flex items-center gap-3 px-4 py-3 transition active:scale-[0.98]"
       >
         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#c99a5b22] text-xl">

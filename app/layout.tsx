@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 
 export const metadata: Metadata = {
   title: "케미체크 — 우리 궁합 몇 점?",
@@ -21,7 +22,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <AnalyticsProvider />
+        {children}
+      </body>
     </html>
   );
 }

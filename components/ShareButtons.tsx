@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { ChemiResult, RelationType } from "@/lib/scoring/types";
 import type { ChemiReport } from "@/lib/copy/types";
 import { loadKakao, isKakaoEnabled } from "@/lib/share/kakao";
+import { track } from "@/lib/analytics";
 import StoryCard from "./StoryCard";
 
 export default function ShareButtons({
@@ -33,6 +34,7 @@ export default function ShareButtons({
   }
 
   async function handleCopy() {
+    track("share_click", { channel: "link" });
     try {
       await navigator.clipboard.writeText(window.location.href);
       flash("링크가 복사됐어요! 친구에게 붙여넣기 📋");
@@ -43,6 +45,7 @@ export default function ShareButtons({
 
   async function handleSaveImage() {
     if (!storyRef.current || busy) return;
+    track("share_click", { channel: "png" });
     setBusy(true);
     try {
       const { toPng } = await import("html-to-image");
@@ -63,6 +66,7 @@ export default function ShareButtons({
   }
 
   async function handleKakao() {
+    track("share_click", { channel: "kakao" });
     const kakao = await loadKakao();
     if (!kakao) {
       flash("카카오 공유는 준비 중이에요. 링크 복사를 이용해주세요!");

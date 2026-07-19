@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { RelationType } from "@/lib/scoring/types";
 import { encodePayload } from "@/lib/share/encode";
+import { track, referrerType } from "@/lib/analytics";
 
 const RELATIONS: { value: RelationType; label: string; emoji: string }[] = [
   { value: "couple", label: "썸/연인", emoji: "💗" },
@@ -65,6 +66,10 @@ export default function ChemiForm() {
   const [relation, setRelation] = useState<RelationType>("couple");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    track("landing_view", { referrer_type: referrerType() });
+  }, []);
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!HANGUL.test(aName.trim()) || !HANGUL.test(bName.trim())) {
@@ -76,6 +81,8 @@ export default function ChemiForm() {
       return;
     }
     setError("");
+    // 관계(category)만 전송 — 이름·생년월일 등 입력값은 절대 전송하지 않음
+    track("input_submit", { category: relation });
     const d = encodePayload({
       a: { name: aName.trim(), birth: aBirth },
       b: { name: bName.trim(), birth: bBirth },

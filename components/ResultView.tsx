@@ -6,6 +6,7 @@ import { PersonaBadge } from "./PersonaBadge";
 import ShareButtons from "./ShareButtons";
 import AdRails from "./AdRails";
 import { ResultBridge } from "./ResultBridge";
+import { ResultTracker } from "./ResultTracker";
 import { Footer } from "./footer";
 
 const RELATION_LABEL: Record<RelationType, string> = {
@@ -61,6 +62,12 @@ export default function ResultView({
 }) {
   return (
     <main className="mx-auto w-full max-w-md px-4 py-6 pb-32 lg:pb-6">
+      {/* 결과 진입 계측 (관계·점수 구간만, 개인정보 미전송) */}
+      <ResultTracker
+        category={relation}
+        scoreBand={String(Math.floor(result.score / 10) * 10)}
+      />
+
       {/* 헤더: 두 이름 + 관계 */}
       <header className="mb-3 text-center text-white drop-shadow">
         <p className="text-sm font-semibold text-white/90">
